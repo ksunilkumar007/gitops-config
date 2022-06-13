@@ -10,7 +10,7 @@ commonLabels:
 
 # replace the image tag of the container with latest
 images:
-  - digest: sha256:6712e060c3c19e58a781b10628b9d80ef99a6a494fb94d82a77695017f40490f
+  - digest: sha256:ebf4dfd6fc2d17ff9aeb4d6945fd095c455e64b0f0584218eae31c08f3c65bfc
     name: quay.io/skhobrag/person-service:v1.0.1
     newName: quay.io/skhobrag/person-service:v1.0.1
 
