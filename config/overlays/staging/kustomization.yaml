@@ -1,0 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+
+#namePrefix: dev-
+commonLabels:
+  variant: development
+
+# in stage we have 2 replicas
+replicas:
+  - count: 2
+    name: person-service
+
+# replace the image tag of the container with latest
+images:
+  - digest: sha256:6712e060c3c19e58a781b10628b9d80ef99a6a494fb94d82a77695017f40490f
+    name: quay.io/skhobrag/person-service:v1.0.1
+    newName: quay.io/skhobrag/person-service:v1.0.1
+
+# generate a configmap
+configMapGenerator:
+  - literals:
+      - APP_GREETING=We are in STAGING mode
+    name: app-config
+
+# This patch provides the name of the namespace into the env-value of the Job
+# This is needed because we want to call the target rest service of person-service
+# which is: person-service.$NAMESPACE.svc:8080
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: book-stage
+    target:
+      kind: Job
