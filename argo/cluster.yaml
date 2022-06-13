@@ -11,6 +11,6 @@ spec:
   source:
     directory:
       recurse: true
-    path: cluster
+    path: clusters
     repoURL: https://github.com/ksunilkumar007/gitops-config.git
     targetRevision: HEAD
