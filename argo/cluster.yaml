@@ -5,7 +5,7 @@ metadata:
   namespace: openshift-gitops
 spec:
   destination:
-    namespace: default
+    namespace: gitops-cluster
     server: https://kubernetes.default.svc
   project: default
   source:
@@ -14,3 +14,7 @@ spec:
     path: clusters
     repoURL: https://github.com/ksunilkumar007/gitops-config.git
     targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

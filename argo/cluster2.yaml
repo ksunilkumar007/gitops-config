@@ -1,20 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: app-book-dev
+  name: cluster-configs-2
   namespace: openshift-gitops
 spec:
   destination:
-    namespace: book-dev
+    namespace: gitops-cluster
     server: https://kubernetes.default.svc
   project: default
   source:
     directory:
       recurse: true
-    path: config/overlays/dev
+    path: clusters
     repoURL: https://github.com/ksunilkumar007/gitops-config.git
-    targetRevision: main
+    targetRevision: HEAD
   syncPolicy:
     automated:
-      prune: true
-      selfHeal: true
+      prune: false
+      selfHeal: false
