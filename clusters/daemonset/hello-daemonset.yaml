@@ -26,5 +26,5 @@ spec:
               protocol: TCP
           resources: {}
           terminationMessagePath: /dev/termination-log
-      serviceAccount: openshift-gitops-argocd-application-controller
+      serviceAccount: default
       terminationGracePeriodSeconds: 10
