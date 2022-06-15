@@ -18,7 +18,7 @@ spec:
       nodeSelector:
         role: worker
       containers:
-        - image: openshift/hello-openshift
+        - image: docker.io/openshift/hello-openshift
           imagePullPolicy: Always
           name: registry
           ports:
