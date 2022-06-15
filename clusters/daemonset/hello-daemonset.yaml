@@ -6,6 +6,10 @@ spec:
   selector:
     matchLabels:
       name: hello-daemonset
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
   template:
     metadata:
       labels:
