@@ -18,13 +18,15 @@
      If you want to do that, then update the rbac stanza in your main argocd CRD in the openshift-gitops namespace:
      https://github.com/pittar-gitops/00-setup-and-documentation/blob/main/argocd-patch.yaml#L114
 
+     https://argo-cd.readthedocs.io/en/stable/operator-manual/rbac/
+
 ![ScreenShot](../images/ArgoCD-cluster2.png)
 
  2 Case 2 Login via admin and passwrod from secret named "openshift-gitops-cluste" from openshift-gitops namespace
 
 ![ScreenShot](../images/ArgoCD-cluster3.png)
 
- 3 Sync the Application
+ 3 Sync the Application ... this time there will be now sync error 
 
 ![ScreenShot](../images/ArgoCD-cluster4.png)
 
