@@ -8,6 +8,7 @@ allowHostNetwork: true
 allowHostPID: true
 allowHostPorts: true
 allowPrivilegedContainer: false
+readOnlyRootFilesystem: false
 runAsUser:
   type: MustRunAsRange
   uidRangeMin: 1000
