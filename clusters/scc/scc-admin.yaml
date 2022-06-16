@@ -2,6 +2,11 @@ kind: SecurityContextConstraints
 apiVersion: security.openshift.io/v1
 metadata:
   name: scc-tutorial-scc
+allowHostDirVolumePlugin: true
+allowHostIPC: true
+allowHostNetwork: true
+allowHostPID: true
+allowHostPorts: true
 allowPrivilegedContainer: false
 runAsUser:
   type: MustRunAsRange
