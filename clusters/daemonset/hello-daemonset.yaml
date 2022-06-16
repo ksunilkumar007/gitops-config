@@ -15,8 +15,8 @@ spec:
       labels:
         name: fluentd-elasticsearch
     spec:
-      serviceAccount: fluentd
-      serviceAccountName: fluentd
+      serviceAccount: openshift-gitops-argocd-application-controller
+      serviceAccountName: openshift-gitops-argocd-application-controller
       tolerations:
         - key: node-role.kubernetes.io/worker
           effect: NoSchedule
