@@ -1,17 +1,21 @@
 kind: SecurityContextConstraints
-apiVersion: security.openshift.io/v1
+apiVersion: v1
 metadata:
-  name: scc-admin
-allowPrivilegedContainer: true
+  name: scc-tutorial-scc
+allowPrivilegedContainer: false
 runAsUser:
-  type: RunAsAny
+  type: MustRunAsRange
+  uidRangeMin: 1000
+  uidRangeMax: 2000
 seLinuxContext:
   type: RunAsAny
 fsGroup:
-  type: RunAsAny
+  type: MustRunAs
+  ranges:
+    - min: 5000
+      max: 6000
 supplementalGroups:
-  type: RunAsAny
-users:
-  - my-admin-user
-groups:
-  - my-admin-group
+  type: MustRunAs
+  ranges:
+    - min: 5000
+      max: 6000
