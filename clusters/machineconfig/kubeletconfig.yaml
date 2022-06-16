@@ -3,8 +3,9 @@ kind: KubeletConfig
 metadata:
   name: set-max-pods
 spec:
+  logLevel: 5
   machineConfigPoolSelector:
     matchLabels:
-      custom-kubelet: set-max-pods
+      pools.operator.machineconfiguration.openshift.io/worker: ""
   kubeletConfig:
-    maxPods: 500
+    maxPods: 350
