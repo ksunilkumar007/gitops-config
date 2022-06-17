@@ -1,0 +1,85 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  annotations:
+    creationTimestamp: '2022-05-24T05:59:01Z'
+  generation: 10
+  name: build-and-deploy-entitlement-service
+  namespace: entitlement
+  resourceVersion: '258341191'
+  uid: e9ad9958-2c05-43c4-b184-39d2848e097d
+spec:
+  params:
+    - description: name of the deployment to be patched
+      name: deployment-name
+      type: string
+    - description: url of the git repo for the code of deployment
+      name: git-url
+      type: string
+    - description: revision to be used from repo of the code for deployment
+      name: git-revision
+      type: string
+    - description: image to be built from the code
+      name: IMAGE
+      type: string
+  tasks:
+    - name: fetch-repository
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: subdirectory
+          value: clonedata
+        - name: deleteExisting
+          value: 'true'
+        - name: sslVerify
+          value: 'false'
+        - name: noProxy
+          value: gitlab.ccilindia.net
+        - name: revision
+          value: $(params.git-revision)
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+    - name: build-image
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)
+        - name: TLSVERIFY
+          value: 'false'
+        - name: CONTEXT
+          value: clonedata
+      runAfter:
+        - fetch-repository
+      taskRef:
+        kind: ClusterTask
+        name: buildah
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+    - name: oc-deploy
+      params:
+        - name: SCRIPT
+          value: >
+            echo "-----------Creating deployment-----------"
+
+            oc delete deployment entitlement
+
+            oc apply --filename clonedata/entitlement-deployment.yaml
+
+            oc wait --for=condition=available --timeout=600s
+            deployment/entitlement
+
+            echo "-----------Deployment Completed-----------"
+      runAfter:
+        - build-image
+      taskRef:
+        kind: ClusterTask
+        name: openshift-client
+      workspaces:
+        - name: manifest-dir
+          workspace: shared-workspace
+  workspaces:
+    - name: shared-workspace
