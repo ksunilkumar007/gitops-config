@@ -5,32 +5,8 @@ metadata:
   namespace: pipeline-tutorial
 spec:
   serviceAccountName: pipeline
-triggers:
-  - name: github-listener
-    interceptors:
-      - ref:
-          name: "github"
-          kind: ClusterInterceptor
-          apiVersion: triggers.tekton.dev
-        params:
-          - name: "secretRef"
-            value:
-              secretName: github-secret
-              secretKey: secretToken
-          - name: "eventTypes"
-            value: ["pull_request"]
-  - name: cel
-    interceptors:
-      - ref:
-          name: cel
-        params:
-          - name: "overlays"
-            value:
-              - key: truncated_sha
-                expression: "body.pull_request.head.sha.truncate(7)"
-              - key: branch_name
-                expression: "body.ref.split('/')[2]"
-    bindings:
-      - ref: springbootweb-binding
-    template:
-      ref: springbootweb-triggertemplate
+  triggers:
+    - triggerRef: springbootweb-trigger
+  resources:
+    kubernetesResource:
+      serviceType: NodePort
