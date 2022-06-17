@@ -1,85 +1,75 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
+  name: build-and-deploy
   annotations:
-    creationTimestamp: '2022-05-24T05:59:01Z'
-  generation: 10
-  name: build-and-deploy-entitlement-service
-  namespace: entitlement
-  resourceVersion: '258341191'
-  uid: e9ad9958-2c05-43c4-b184-39d2848e097d
+    argocd.argoproj.io/sync-wave: "5"
 spec:
+  workspaces:
+    - name: shared-workspace
   params:
-    - description: name of the deployment to be patched
-      name: deployment-name
+    - name: deployment-name
       type: string
-    - description: url of the git repo for the code of deployment
-      name: git-url
+      description: name of the deployment to be patched
+    - name: git-url
       type: string
-    - description: revision to be used from repo of the code for deployment
-      name: git-revision
+      description: url of the git repo for the code of deployment
+    - name: git-revision
       type: string
-    - description: image to be built from the code
-      name: IMAGE
+      description: revision to be used from repo of the code for deployment
+      default: "master"
+    - name: IMAGE
       type: string
+      description: image to be build from the code
   tasks:
     - name: fetch-repository
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      workspaces:
+        - name: output
+          workspace: shared-workspace
       params:
         - name: url
           value: $(params.git-url)
         - name: subdirectory
-          value: clonedata
+          value: ""
         - name: deleteExisting
-          value: 'true'
-        - name: sslVerify
-          value: 'false'
-        - name: noProxy
-          value: gitlab.ccilindia.net
+          value: "true"
         - name: revision
           value: $(params.git-revision)
-      taskRef:
-        kind: ClusterTask
-        name: git-clone
-      workspaces:
-        - name: output
-          workspace: shared-workspace
     - name: build-image
+      taskRef:
+        name: buildah
+        kind: ClusterTask
       params:
+        - name: TLSVERIFY
+          value: "false"
         - name: IMAGE
           value: $(params.IMAGE)
-        - name: TLSVERIFY
-          value: 'false'
-        - name: CONTEXT
-          value: clonedata
-      runAfter:
-        - fetch-repository
-      taskRef:
-        kind: ClusterTask
-        name: buildah
       workspaces:
         - name: source
           workspace: shared-workspace
-    - name: oc-deploy
-      params:
-        - name: SCRIPT
-          value: >
-            echo "-----------Creating deployment-----------"
-
-            oc delete deployment entitlement
-
-            oc apply --filename clonedata/entitlement-deployment.yaml
-
-            oc wait --for=condition=available --timeout=600s
-            deployment/entitlement
-
-            echo "-----------Deployment Completed-----------"
+      runAfter:
+        - fetch-repository
+    - name: apply-manifests
+      taskRef:
+        name: apply-manifests
+      workspaces:
+        - name: source
+          workspace: shared-workspace
       runAfter:
         - build-image
+    - name: update-deployment
       taskRef:
-        kind: ClusterTask
-        name: openshift-client
+        name: update-deployment
       workspaces:
-        - name: manifest-dir
+        - name: source
           workspace: shared-workspace
-  workspaces:
-    - name: shared-workspace
+      params:
+        - name: deployment
+          value: $(params.deployment-name)
+        - name: IMAGE
+          value: $(params.IMAGE)
+      runAfter:
+        - apply-manifests

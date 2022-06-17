@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster-configs-3
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: gitops-cluster
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    directory:
+      recurse: true
+    path: tekton-pipeline
+    repoURL: https://github.com/ksunilkumar007/gitops-config.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: false
