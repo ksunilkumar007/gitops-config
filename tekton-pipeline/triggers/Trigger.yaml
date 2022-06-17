@@ -2,6 +2,7 @@ apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
   name: springbootweb-trigger
+  namespace: pipeline-tutorial
 spec:
   interceptors:
     - ref:
